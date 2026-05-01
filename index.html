@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reelr — Stop the Scroll. Every Time.</title>
+
+<!-- Social / WhatsApp / Open Graph -->
+<meta name="description" content="Reelr generates 3 magnetic social media hook statements from your photo description — instantly. Stop the scroll, spark comments, and say what no one else will.">
+<meta property="og:title" content="Reelr — Stop the Scroll. Every Time.">
+<meta property="og:description" content="Describe your photo. Pick your vibe. Get 3 scroll-stopping hooks in seconds. Free, no sign-up.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://og-image.vercel.app/Reelr%20%E2%80%94%20Stop%20the%20Scroll.png?theme=dark&md=1&fontSize=100px">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Reelr — Stop the Scroll. Every Time.">
+<meta name="twitter:description" content="Describe your photo. Pick your vibe. Get 3 scroll-stopping hooks in seconds.">
+<meta name="theme-color" content="#0A0A0F">
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0A0A0F;
+    --surface: #111118;
+    --surface2: #18181f;
+    --border: rgba(255,255,255,0.07);
+    --border-glow: rgba(120,80,255,0.35);
+    --text: #F0EEF8;
+    --muted: #6B6880;
+    --accent: #8B5CF6;
+    --accent2: #06D6A0;
+    --accent3: #FF6B9D;
+    --neon: #A78BFA;
+    --neon-glow: 0 0 20px rgba(139,92,246,0.4), 0 0 60px rgba(139,92,246,0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(139,92,246,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 110%, rgba(6,214,160,0.07) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .container {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+    position: relative; z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .logo-lockup {
+    display: inline-flex; align-items: center; gap: 12px;
+    margin-bottom: 24px;
+  }
+  .logo-icon {
+    filter: drop-shadow(0 0 12px rgba(139,92,246,0.45));
+    flex-shrink: 0;
+  }
+  .logo-wordmark {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px; font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #A78BFA 0%, #06D6A0 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 8vw, 52px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #F0EEF8 0%, #A78BFA 50%, #06D6A0 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+
+  .tagline {
+    font-size: 14px; color: var(--muted); line-height: 1.6;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .card:nth-child(2) { animation-delay: 0.1s; }
+  .card:nth-child(3) { animation-delay: 0.2s; }
+
+  .card-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.14em; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-label::after {
+    content: ''; flex: 1; height: 1px;
+    background: var(--border);
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    resize: none;
+    min-height: 130px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  textarea::placeholder { color: var(--muted); }
+  textarea:focus {
+    border-color: rgba(139,92,246,0.5);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+  }
+
+  .char-count {
+    text-align: right; font-size: 11px;
+    color: var(--muted); margin-top: 6px;
+  }
+
+  /* Vibe Pills */
+  .vibe-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .vibe-pill {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .vibe-pill:hover { border-color: rgba(255,255,255,0.15); }
+  .vibe-pill.active {
+    border-color: var(--border-glow);
+    background: rgba(139,92,246,0.1);
+    box-shadow: 0 0 0 1px rgba(139,92,246,0.2);
+  }
+  .vibe-pill input[type="checkbox"] { display: none; }
+
+  .vibe-icon { font-size: 18px; }
+  .vibe-info { flex: 1; }
+  .vibe-name {
+    font-size: 13px; font-weight: 600; color: var(--text);
+    display: block;
+  }
+  .vibe-desc { font-size: 11px; color: var(--muted); }
+
+  .vibe-check {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .vibe-pill.active .vibe-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* Generate button */
+  .btn-generate {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #7C3AED, #8B5CF6, #6D28D9);
+    border: none;
+    border-radius: 14px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px; font-weight: 700;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    box-shadow: 0 4px 24px rgba(139,92,246,0.35);
+    margin-bottom: 16px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-generate:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 32px rgba(139,92,246,0.45);
+  }
+  .btn-generate:active { transform: translateY(0); }
+  .btn-generate:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .btn-generate::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+  }
+
+  .btn-text { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+  /* Loading dots */
+  .dots { display: inline-flex; gap: 4px; }
+  .dots span {
+    width: 5px; height: 5px;
+    background: #fff; border-radius: 50%;
+    animation: bounce 1s ease infinite;
+  }
+  .dots span:nth-child(2) { animation-delay: 0.15s; }
+  .dots span:nth-child(3) { animation-delay: 0.3s; }
+
+  /* Output */
+  .output-section {
+    display: none;
+    animation: fadeUp 0.4s ease both;
+  }
+  .output-section.visible { display: block; }
+
+  .output-header {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px; font-weight: 700;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .output-header .sparkle { color: var(--accent2); }
+
+  .hook-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 12px;
+    position: relative;
+    transition: border-color 0.2s;
+    animation: hookIn 0.35s ease both;
+  }
+  .hook-card:nth-child(2) { animation-delay: 0.1s; }
+  .hook-card:nth-child(3) { animation-delay: 0.2s; }
+  .hook-card:hover { border-color: rgba(255,255,255,0.12); }
+
+  .hook-type {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .hook-type .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .type-scroll .dot { background: var(--accent); }
+  .type-question .dot { background: var(--accent2); }
+  .type-contrast .dot { background: var(--accent3); }
+  .type-scroll { color: var(--neon); }
+  .type-question { color: var(--accent2); }
+  .type-contrast { color: var(--accent3); }
+
+  .hook-text {
+    font-size: 15px; line-height: 1.6;
+    color: var(--text); font-weight: 400;
+    padding-right: 40px;
+  }
+
+  .copy-btn {
+    position: absolute; top: 16px; right: 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); cursor: pointer;
+    transition: all 0.18s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+  .copy-btn.copied {
+    background: rgba(6,214,160,0.12);
+    border-color: rgba(6,214,160,0.3);
+    color: var(--accent2);
+  }
+
+  .regen-row {
+    display: flex; gap: 10px; margin-top: 4px;
+  }
+  .btn-regen {
+    flex: 1; padding: 13px;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-regen:hover { border-color: rgba(255,255,255,0.18); color: var(--text); }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-6px); }
+  }
+  @keyframes hookIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 100px; padding: 10px 20px;
+    font-size: 13px; color: var(--accent2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    opacity: 0; transition: opacity 0.3s;
+    white-space: nowrap; z-index: 100;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 400px) {
+    .vibe-grid { grid-template-columns: 1fr; }
+    .container { padding: 24px 16px 50px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="logo-lockup">
+      <svg class="logo-icon" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="rg1" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#A78BFA"/>
+            <stop offset="100%" stop-color="#06D6A0"/>
+          </linearGradient>
+          <linearGradient id="rg2" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C3AED"/>
+            <stop offset="100%" stop-color="#059669"/>
+          </linearGradient>
+          <filter id="glow"><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <circle cx="24" cy="24" r="21" stroke="url(#rg1)" stroke-width="2" fill="none" opacity="0.6"/>
+        <circle cx="24" cy="24" r="6" fill="url(#rg1)" opacity="0.9"/>
+        <circle cx="24" cy="8"  r="3" fill="url(#rg1)" filter="url(#glow)"/>
+        <circle cx="24" cy="40" r="3" fill="url(#rg1)" filter="url(#glow)"/>
+        <circle cx="8"  cy="24" r="3" fill="url(#rg1)" filter="url(#glow)"/>
+        <circle cx="40" cy="24" r="3" fill="url(#rg1)" filter="url(#glow)"/>
+        <circle cx="12.7" cy="12.7" r="3" fill="url(#rg2)" opacity="0.7"/>
+        <circle cx="35.3" cy="35.3" r="3" fill="url(#rg2)" opacity="0.7"/>
+        <circle cx="35.3" cy="12.7" r="3" fill="url(#rg2)" opacity="0.7"/>
+        <circle cx="12.7" cy="35.3" r="3" fill="url(#rg2)" opacity="0.7"/>
+        <path d="M21 20.5 L28.5 24 L21 27.5 Z" fill="#fff" opacity="0.95"/>
+      </svg>
+      <span class="logo-wordmark">Reelr</span>
+    </div>
+    <h1>Stop the Scroll.<br>Every Time.</h1>
+    <p class="tagline">Describe your photo. Pick your vibe.<br>Get 3 magnetic hooks — instantly.</p>
+  </div>
+
+  <!-- Input -->
+  <div class="card">
+    <div class="card-label">Describe Your Photo</div>
+    <textarea id="photoDesc" placeholder="e.g. Me holding a coffee at 6am before my gym session, the lighting is golden, I look exhausted but determined..." maxlength="400" oninput="updateChar()"></textarea>
+    <div class="char-count"><span id="charCount">0</span>/400</div>
+  </div>
+
+  <!-- Vibes -->
+  <div class="card">
+    <div class="card-label">Tune the Vibe</div>
+    <div class="vibe-grid">
+      <label class="vibe-pill" id="pill-professional">
+        <input type="checkbox" value="professional" onchange="togglePill(this)">
+        <span class="vibe-icon">💼</span>
+        <span class="vibe-info">
+          <span class="vibe-name">Professional</span>
+          <span class="vibe-desc">Thought-leader energy</span>
+        </span>
+        <span class="vibe-check">✓</span>
+      </label>
+      <label class="vibe-pill" id="pill-controversial">
+        <input type="checkbox" value="controversial" onchange="togglePill(this)">
+        <span class="vibe-icon">🔥</span>
+        <span class="vibe-info">
+          <span class="vibe-name">Hot Take</span>
+          <span class="vibe-desc">Controversial & bold</span>
+        </span>
+        <span class="vibe-check">✓</span>
+      </label>
+      <label class="vibe-pill" id="pill-humorous">
+        <input type="checkbox" value="humorous" onchange="togglePill(this)">
+        <span class="vibe-icon">😈</span>
+        <span class="vibe-info">
+          <span class="vibe-name">Gremlin Mode</span>
+          <span class="vibe-desc">Chaotic & funny</span>
+        </span>
+        <span class="vibe-check">✓</span>
+      </label>
+      <label class="vibe-pill" id="pill-vulnerable">
+        <input type="checkbox" value="vulnerable" onchange="togglePill(this)">
+        <span class="vibe-icon">🫂</span>
+        <span class="vibe-info">
+          <span class="vibe-name">Vulnerable</span>
+          <span class="vibe-desc">Raw & emotional</span>
+        </span>
+        <span class="vibe-check">✓</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Button -->
+  <button class="btn-generate" id="generateBtn" onclick="generateHooks()">
+    <span class="btn-text" id="btnText">⏺ Generate My Hooks</span>
+  </button>
+
+  <!-- Output -->
+  <div class="output-section" id="outputSection">
+    <div class="output-header">
+      <span class="sparkle">✦</span> Here are your Hooks:
+    </div>
+
+    <div class="hook-card" id="hookScroll">
+      <div class="hook-type type-scroll"><span class="dot"></span>Stop the Scroll</div>
+      <div class="hook-text" id="hook1"></div>
+      <button class="copy-btn" onclick="copyHook(this, 'hook1')">Copy</button>
+    </div>
+
+    <div class="hook-card" id="hookQuestion">
+      <div class="hook-type type-question"><span class="dot"></span>Comment Bait</div>
+      <div class="hook-text" id="hook2"></div>
+      <button class="copy-btn" onclick="copyHook(this, 'hook2')">Copy</button>
+    </div>
+
+    <div class="hook-card" id="hookContrast">
+      <div class="hook-type type-contrast"><span class="dot"></span>The Contrarian</div>
+      <div class="hook-text" id="hook3"></div>
+      <button class="copy-btn" onclick="copyHook(this, 'hook3')">Copy</button>
+    </div>
+
+    <div class="regen-row">
+      <button class="btn-regen" onclick="generateHooks()">↺ Regenerate</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">Copied to clipboard ✓</div>
+
+<script>
+// ─── Keyword → Hook Templates ────────────────────────────────────────────────
+
+const HOOK_DB = {
+  coffee: {
+    scroll: [
+      "This is what peak performance looks like before the world catches up.",
+      "The ritual that runs me before anything else does.",
+      "Not a morning person. A coffee person. There's a difference."
+    ],
+    question: [
+      "Is it even a morning without it, or are we all just pretending?",
+      "Be honest — how many of these until you feel human?",
+      "What's YOUR non-negotiable morning ritual? Drop it below."
+    ],
+    contrast: [
+      "Most overrated beverage? Yes. Do I care? Absolutely not.",
+      "They said drink water. I compromised. Brown water.",
+      "Wellness girlies are having matcha. I'm having a personality."
+    ]
+  },
+  gym: {
+    scroll: [
+      "5am. Empty room. Just you and the weight of your excuses.",
+      "This is what 'I'll start Monday' looks like on a Thursday.",
+      "Nobody's watching. That's exactly why this counts."
+    ],
+    question: [
+      "Are you actually consistent, or just consistent about starting over?",
+      "What time do you train — and are you lying about it?",
+      "Which is harder: showing up or staying? Be honest."
+    ],
+    contrast: [
+      "Fitness culture says love the process. The process currently hates me.",
+      "They said it would get easier. They were wrong. You just get angrier.",
+      "Hot girl summer didn't warn me about sore girl autumn."
+    ]
+  },
+  beach: {
+    scroll: [
+      "The ocean doesn't care about your problems. That's actually the point.",
+      "Sun, salt, and the radical decision to be unreachable for one day.",
+      "This is what stepping away looks like. It's not laziness. It's strategy."
+    ],
+    question: [
+      "Mountains or beach — and what does your answer say about you?",
+      "When was the last time you did nothing, on purpose?",
+      "Could you actually switch off here, or would you still be checking your phone?"
+    ],
+    contrast: [
+      "They said beaches are relaxing. I said that's aggressive sand.",
+      "Paradise is 30% vibes, 70% pretending you don't have a full inbox.",
+      "Vacation mode activated. Anxiety didn't get the memo."
+    ]
+  },
+  travel: {
+    scroll: [
+      "Somewhere between lost and arrived, I found the part of me I'd been missing.",
+      "Not all who wander are lost. Some of us just have bad Google Maps signal.",
+      "This is what choosing experiences over things actually looks like."
+    ],
+    question: [
+      "What's the one place that completely rewired the way you think?",
+      "Would you rather travel alone once, or never travel at all?",
+      "Is travel actually broadening your mind, or just your camera roll?"
+    ],
+    contrast: [
+      "Wanderlust is just a pretty word for perpetual restlessness. Worth it though.",
+      "Instagrammable location. Non-instagrammable anxiety about re-entering normal life.",
+      "They said travel changes you. It did. My bank account is unrecognizable."
+    ]
+  },
+  food: {
+    scroll: [
+      "Some people eat to live. We live to eat. And this plate is a religious experience.",
+      "The chef didn't make this. A poet did.",
+      "This is the kind of meal you clear your schedule for."
+    ],
+    question: [
+      "What's the one meal you'd fly across the world to eat again?",
+      "Be honest — do you actually taste it, or just photograph it?",
+      "Food as self-care: deeply valid or deeply unhinged? Go."
+    ],
+    contrast: [
+      "Clean eating is great. This is better.",
+      "Diet culture didn't invent joy. But this plate came close.",
+      "They said eat mindfully. I mindfully ate everything."
+    ]
+  },
+  sunset: {
+    scroll: [
+      "The sky doing what it does every day and somehow I'm still not over it.",
+      "This is what free looks like. Available nightly. Most of us are too busy to look up.",
+      "5 minutes. This exact light. Never again. I showed up."
+    ],
+    question: [
+      "When did you last stop to watch the actual sky? Not photograph it. Watch it.",
+      "Does the beauty feel different when you're chasing it vs when it finds you?",
+      "Sunsets: romanticized or genuinely the universe's apology for Mondays?"
+    ],
+    contrast: [
+      "Posted another sunset. The algorithm is tired of me. So am I. Still posting.",
+      "Nature gives us this for free every single day. We spend thousands on experiences half as good.",
+      "They said 'you can't out-edit a sunset.' Challenge accepted."
+    ]
+  },
+  work: {
+    scroll: [
+      "Building something no one else believes in yet is the loneliest, most alive feeling.",
+      "This is what the grind actually looks like. Less aesthetic, more real.",
+      "The work that matters never feels finished. That's how you know it's the right work."
+    ],
+    question: [
+      "What are you building right now that scares you a little?",
+      "Hustle culture is toxic — so why do some of us still love the work?",
+      "At what point does ambition become identity? I'm genuinely asking."
+    ],
+    contrast: [
+      "'Work-life balance' said no one building something meaningful. Discuss.",
+      "Passion project. The word 'passion' is doing a lot of heavy lifting here.",
+      "They said follow your dreams. The dreams had a 60-hour work week."
+    ]
+  },
+  default: {
+    scroll: [
+      "There's a story behind this frame that the caption won't tell you.",
+      "This moment cost nothing. It's worth everything.",
+      "Presence. That's the whole caption."
+    ],
+    question: [
+      "What does this make you feel, and why does that make you uncomfortable?",
+      "If this photo could talk, what would it say about where I am right now?",
+      "Does authenticity online still count if we know it's curated?"
+    ],
+    contrast: [
+      "Most people will scroll past this without stopping. That's okay. You weren't most people.",
+      "The algorithm wants me to explain this. I'd rather let it breathe.",
+      "Context is everything. And context is completely missing. That's the point."
+    ]
+  }
+};
+
+// Vibe modifiers
+const VIBE_PREFIXES = {
+  professional: ["Here's what most people miss:", "The strategy behind this:", "Unpopular opinion for the boardroom:"],
+  controversial: ["Let's be real —", "Nobody asked but here it is:", "I will die on this hill:"],
+  humorous: ["Nobody's business but here we are:", "Sending this to my therapist first:", "My Roman Empire, actually:"],
+  vulnerable: ["I almost didn't post this, but:", "This took more courage than it looks:", "Showing up anyway:"]
+};
+
+// ─── Logic ────────────────────────────────────────────────────────────────────
+
+function updateChar() {
+  const val = document.getElementById('photoDesc').value.length;
+  document.getElementById('charCount').textContent = val;
+}
+
+function togglePill(checkbox) {
+  const pill = checkbox.closest('.vibe-pill');
+  pill.classList.toggle('active', checkbox.checked);
+}
+
+function getActiveVibes() {
+  return Array.from(document.querySelectorAll('.vibe-pill input:checked')).map(c => c.value);
+}
+
+function detectKeyword(text) {
+  const t = text.toLowerCase();
+  const keywords = ['coffee', 'gym', 'beach', 'travel', 'food', 'sunset', 'work'];
+  for (const kw of keywords) {
+    if (t.includes(kw)) return kw;
+  }
+  // secondary
+  const extras = { morning: 'coffee', workout: 'gym', fitness: 'gym', ocean: 'beach', sea: 'beach', eat: 'food', restaurant: 'food', dinner: 'food', sky: 'sunset', golden: 'sunset', office: 'work', project: 'work' };
+  for (const [alias, kw] of Object.entries(extras)) {
+    if (t.includes(alias)) return kw;
+  }
+  return 'default';
+}
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function buildHook(base, vibes) {
+  if (!vibes.length) return base;
+  // Apply one vibe prefix if active
+  const vibe = pick(vibes);
+  const prefix = pick(VIBE_PREFIXES[vibe]);
+  return prefix + ' ' + base.charAt(0).toLowerCase() + base.slice(1);
+}
+
+async function generateHooks() {
+  const desc = document.getElementById('photoDesc').value.trim();
+  if (!desc) {
+    document.getElementById('photoDesc').focus();
+    document.getElementById('photoDesc').style.borderColor = 'rgba(255,100,100,0.5)';
+    setTimeout(() => document.getElementById('photoDesc').style.borderColor = '', 1500);
+    return;
+  }
+
+  const btn = document.getElementById('generateBtn');
+  const btnText = document.getElementById('btnText');
+  btn.disabled = true;
+  btnText.innerHTML = `<span>Analyzing the Vibe</span><span class="dots"><span></span><span></span><span></span></span>`;
+
+  const vibes = getActiveVibes();
+  const keyword = detectKeyword(desc);
+  const hooks = HOOK_DB[keyword] || HOOK_DB.default;
+
+  await new Promise(r => setTimeout(r, 1400));
+
+  document.getElementById('hook1').textContent = buildHook(pick(hooks.scroll), vibes);
+  document.getElementById('hook2').textContent = buildHook(pick(hooks.question), vibes);
+  document.getElementById('hook3').textContent = buildHook(pick(hooks.contrast), vibes);
+
+  // Reset copy buttons
+  document.querySelectorAll('.copy-btn').forEach(b => { b.textContent = 'Copy'; b.classList.remove('copied'); });
+
+  const output = document.getElementById('outputSection');
+  output.classList.remove('visible');
+  void output.offsetWidth; // reflow for animation
+  output.classList.add('visible');
+
+  btn.disabled = false;
+  btnText.innerHTML = '⏺ Generate My Hooks';
+
+  setTimeout(() => {
+    document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function copyHook(btn, hookId) {
+  const text = document.getElementById(hookId).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    showToast();
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Enter key shortcut
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') generateHooks();
+});
+</script>
+</body>
+</html>
