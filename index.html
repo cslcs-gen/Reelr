@@ -340,11 +340,11 @@ const DB = {
     tags:["#beachlife","#oceanvibes","#beachday","#saltwater","#paradise","#vacationmode","#coastalliving","#beachvibes","#sunandocean","#slowliving"]
   },
   travel:{
-    scroll:["Somewhere between lost and arrived, I found the part of me I'd been missing.","Not all who wander are lost. Some of us just have bad Google Maps signal.","This is what choosing experiences over things actually looks like."],
-    question:["What's the one place that completely rewired the way you think?","Would you rather travel alone once, or never travel at all?","Is travel actually broadening your mind, or just your camera roll?"],
-    contrast:["Wanderlust is just a pretty word for perpetual restlessness. Worth it though.","Instagrammable location. Non-instagrammable anxiety about re-entering normal life.","They said travel changes you. It did. My bank account is unrecognizable."],
-    caption:["Every time I go somewhere new, I come back a slightly different person.\n\nNot better, not worse. Just updated.\n\nLike a software patch, but for your worldview and your tolerance for delayed flights.","The souvenirs I actually keep aren't in my bag.\n\nThey're in the way I order coffee now, the phrase I can't stop saying, the slightly different version of myself that came home."],
-    tags:["#travel","#wanderlust","#travelgram","#explore","#travelphotography","#adventure","#travelblogger","#worldtravel","#digitalnomad","#travellife"]
+    scroll:["Somewhere between lost and arrived, I found the part of me I'd been missing.","The view from here makes every excuse sound ridiculous.","This is what choosing experiences over things actually looks like.","Some places don't just take your breath away — they give it back differently.","Not all who wander are lost. Some of us just have bad Google Maps signal."],
+    question:["What's the one place that completely rewired the way you think?","Would you rather travel alone once, or never travel at all?","Is there a place that made you feel truly alive? Where was it?","What are you waiting for — seriously, what is the actual reason?","If fear wasn't a factor, where would you go first?"],
+    contrast:["Wanderlust is just a pretty word for perpetual restlessness. Worth it though.","They said stay safe. I said define safe.","Everyone talks about bucket lists. Few actually open the bucket.","They said travel changes you. It did. My bank account is unrecognizable.","Comfort zone has a great view. This view is better."],
+    caption:["There is a version of you that only shows up when the ground is far below and the wind is in your face.\n\nI went looking for that version.\n\nFound her somewhere over a canyon.","Every time I go somewhere new, I come back a slightly different person.\n\nNot better, not worse. Just updated.\n\nLike a software patch, but for your worldview and your tolerance for delayed flights.","The souvenirs I actually keep aren't in my bag.\n\nThey're in the way I see things now. The things I said yes to when every instinct said no.\n\nEspecially those."],
+    tags:["#travel","#wanderlust","#travelgram","#explore","#adventure","#zipline","#canyon","#travelphotography","#adventureseeker","#bucketlist","#outdoors","#naturelover","#exploremore","#travellife"]
   },
   food:{
     scroll:["Some people eat to live. We live to eat. And this plate is a religious experience.","The chef didn't make this. A poet did.","This is the kind of meal you clear your schedule for."],
@@ -402,10 +402,20 @@ function showToast(msg) {
 
 function detectKw(text) {
   const t = text.toLowerCase();
+  // Whole-word match only — prevents 'eat' matching inside 'great', 'eat' in 'repeat', etc.
+  const word = (w) => new RegExp('\\b' + w + '\\b').test(t);
   const primary = ['coffee','gym','beach','travel','food','sunset','work'];
-  for (const k of primary) if (t.includes(k)) return k;
-  const aliases = {morning:'coffee',workout:'gym',fitness:'gym',weights:'gym',ocean:'beach',sea:'beach',coast:'beach',eat:'food',restaurant:'food',dinner:'food',lunch:'food',brunch:'food',sky:'sunset',golden:'sunset',dusk:'sunset',office:'work',project:'work',desk:'work',laptop:'work'};
-  for (const [a,k] of Object.entries(aliases)) if (t.includes(a)) return k;
+  for (const k of primary) if (word(k)) return k;
+  const aliases = {
+    morning:'coffee', espresso:'coffee', latte:'coffee', matcha:'coffee',
+    workout:'gym', fitness:'gym', weights:'gym', training:'gym', running:'gym',
+    ocean:'beach', sea:'beach', coast:'beach', sand:'beach', waves:'beach',
+    eating:'food', restaurant:'food', dinner:'food', lunch:'food', brunch:'food', meal:'food', cook:'food',
+    sky:'sunset', dusk:'sunset', twilight:'sunset',
+    office:'work', project:'work', desk:'work', laptop:'work', meeting:'work', startup:'work',
+    explore:'travel', adventure:'travel', trip:'travel', hiking:'travel', zipline:'travel', canyon:'travel', mountain:'travel', forest:'travel', jungle:'travel'
+  };
+  for (const [a,k] of Object.entries(aliases)) if (word(a)) return k;
   return 'default';
 }
 
